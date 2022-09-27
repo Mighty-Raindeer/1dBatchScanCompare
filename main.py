@@ -10,11 +10,12 @@ import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.gridspec import GridSpec
 
-
 """Requesting files from the user"""
 global measuredatafull, measureheader, referencedatafull, referenceheader, referencedataframe, measurementdataframe
 pd.options.mode.chained_assignment = None  # default='warn'
 pp = PdfPages('test.pdf')
+
+
 def empty_list_remove(input_list):
     new_list = []
     for ele in input_list:
@@ -131,8 +132,9 @@ def splitandstore2(ref):
     #, energy, radiation type, scan type, field size x, field size y, measurment data, measurement time, x, y, z,
     reading, normalized reading] This will be a large matrix of 13 categories with thousands of rows. """
     """we converted the ascii file into a list of lists now we need to extract information"""
-    columnlist = ['measurementnumber', 'measurementdate', 'measurementtime', 'measurementtype', 'Beamtype', 'BeamEnergy', 'fieldsizeX',
-                 'fieldsizeY', 'SSD', 'startX', 'startY', 'startZ', 'stopZ','X','Y','Z','dose']
+    columnlist = ['measurementnumber', 'measurementdate', 'measurementtime', 'measurementtype', 'Beamtype',
+                  'BeamEnergy', 'fieldsizeX',
+                  'fieldsizeY', 'SSD', 'startX', 'startY', 'startZ', 'stopZ', 'X', 'Y', 'Z', 'dose']
     df = pd.DataFrame(columns=columnlist)
 
     totalmeasurenumb = ref[0][1]
@@ -180,9 +182,10 @@ def splitandstore2(ref):
             fulllist.append(
                 [measurementnumber, measurementdate, measurementtime, measurementtype, Beamtype, BeamEnergy, fieldsizeX,
                  fieldsizeY, SSD, startZ, stopZ, xpos, ypos, zpos, dose])
-            df2 = pd.DataFrame([[measurementnumber, measurementdate, measurementtime, measurementtype, Beamtype, BeamEnergy, fieldsizeX,
-                 fieldsizeY, SSD,startX,startY, startZ, stopZ, xpos, ypos, zpos, dose]])
-            pd.concat([df,df2])
+            df2 = pd.DataFrame([[measurementnumber, measurementdate, measurementtime, measurementtype, Beamtype,
+                                 BeamEnergy, fieldsizeX,
+                                 fieldsizeY, SSD, startX, startY, startZ, stopZ, xpos, ypos, zpos, dose]])
+            pd.concat([df, df2])
 
         elif list[0] == ":EOM  ":
             MeasurementList.append(
@@ -190,6 +193,7 @@ def splitandstore2(ref):
                  fieldsizeY, SSD, startX, startY, startZ, stopZ])
     # print(fulllist, MeasurementList)
     return df, MeasurementList
+
 
 def gammacalc():
     print("gamma calc subroutine, call on each matching test then run physics gamma")
@@ -209,13 +213,14 @@ def gammacalc():
         ycheck = measure[10]
         for reference in referenceheader:
             if measuretype == reference[3] and typecheck == reference[4] and energycheck == reference[
-                5] and fieldsizecheckX == reference[6] and abs(depthcheckstart - reference[11]) < 10 and ((xcheck == 0 and reference[9]==0) or (ycheck == 0 and reference[10]==0)):
-                testmatch.append([measure[0],reference[0]])
-                print(measure,reference)
+                5] and fieldsizecheckX == reference[6] and abs(depthcheckstart - reference[11]) < 10 and (
+                    (xcheck == 0 and reference[9] == 0) or (ycheck == 0 and reference[10] == 0)):
+                testmatch.append([measure[0], reference[0]])
+                print(measure, reference)
                 print("matched")
             else:
                 print('no match')
-                print(measure,reference)
+                print(measure, reference)
 
     print(testmatch)
     for group in testmatch:
@@ -229,44 +234,51 @@ def gammacalc():
             (mesdata['xpos'] > -1) & (mesdata['xpos'] < 1) & (mesdata['ypos'] > -1) & (mesdata['ypos'] < 1)]
         refcenterval = refcenter.mean()
         meascenterval = meascenter.mean()
-        refdata.loc[:,('normalized dose')] = (refdata.loc[:,('dose')] / refcenterval)
-        mesdata.loc[:,('normalized dose')] = (mesdata.loc[:,('dose')] / meascenterval)
+        refdata.loc[:, 'normalized dose'] = (refdata.loc[:, 'dose'] / refcenterval)
+        mesdata.loc[:, 'normalized dose'] = (mesdata.loc[:, 'dose'] / meascenterval)
 
-        refdatasorted = refdata.sort_values(by=['xpos','ypos'])
-        mesdatasorted = mesdata.sort_values(by=['xpos','ypos'])
+
+        refdatasorted = refdata.sort_values(by=['xpos', 'ypos'])
+        mesdatasorted = mesdata.sort_values(by=['xpos', 'ypos'])
+        refdatasorted = refdatasorted.drop(index=refdatasorted.first_valid_index())
+        refdatasorted = refdatasorted.drop(index=refdatasorted.last_valid_index())
+        mesdatasorted = mesdatasorted.drop(index=mesdatasorted.first_valid_index())
+        mesdatasorted = mesdatasorted.drop(index=mesdatasorted.last_valid_index())
+
+
 
         refmetadata = refdatasorted.iloc[0]
         mesmetadata = mesdatasorted.iloc[0]
-        refnormaldosenp = refdatasorted.loc[:,('normalized dose')].to_numpy()
-        refxposnp = refdatasorted.loc[:, ('xpos')].to_numpy()
-        refyposnp = refdatasorted.loc[:, ('ypos')].to_numpy()
-        mesnormaldosenp = mesdatasorted.loc[:, ('normalized dose')].to_numpy()
-        mesxposnp = mesdatasorted.loc[:, ('xpos')].to_numpy()
-        mesyposnp = mesdatasorted.loc[:, ('ypos')].to_numpy()
+        refnormaldosenp = refdatasorted.loc[:, 'normalized dose'].to_numpy()
+        refxposnp = refdatasorted.loc[:, 'xpos'].to_numpy()
+        refyposnp = refdatasorted.loc[:, 'ypos'].to_numpy()
+        mesnormaldosenp = mesdatasorted.loc[:, 'normalized dose'].to_numpy()
+        mesxposnp = mesdatasorted.loc[:, 'xpos'].to_numpy()
+        mesyposnp = mesdatasorted.loc[:, 'ypos'].to_numpy()
         print(refmetadata)
         print(mesmetadata)
-        if refxposnp[round(len(refxposnp)/2)] == refxposnp[0]:
+        if refxposnp[round(len(refxposnp) / 2)] == refxposnp[0]:
             print("this is an inline measurement")
 
-            gammareport(refnormaldosenp,refyposnp,mesnormaldosenp,mesyposnp,refmetadata,mesmetadata,"Inline")
+            gammareport(refnormaldosenp, refyposnp, mesnormaldosenp, mesyposnp, refmetadata, mesmetadata, "Inline")
 
-        elif refyposnp[round(len(refyposnp)/2)] == refyposnp[0]:
+        elif refyposnp[round(len(refyposnp) / 2)] == refyposnp[0]:
             print("this is a crossline")
-            gammareport(refnormaldosenp, refyposnp, mesnormaldosenp, mesyposnp,refmetadata,mesmetadata, "Crossline")
+
+            gammareport(refnormaldosenp, refxposnp, mesnormaldosenp, mesxposnp, refmetadata, mesmetadata, "Crossline")
         else:
             print("I have no idea what is happening here...")
 
     pp.close()
 
 
-def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,refmetadata,mesmetadata,direction):
+def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation, refmetadata, mesmetadata, direction):
     try:
-
 
         gamma_options = {
             'dose_percent_threshold': 1,
             'distance_mm_threshold': 1,
-            'lower_percent_dose_cutoff': 10,
+            'lower_percent_dose_cutoff': 75,
             'interp_fraction': 10,  # Should be 10 or more for more accurate results
             'max_gamma': 2,
             'random_subset': None,
@@ -300,7 +312,7 @@ def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,re
         figure_2.suptitle(
             'Gamma evaluation for '.format(refmetadata['beam type']),
             fontsize=12)
-        gs = GridSpec(2,2, figure=figure_2,wspace=.25)
+        gs = GridSpec(2, 2, figure=figure_2, wspace=.25)
         # gs.tight_layout(pad=1.5)
 
         verticaltexti = 0.92
@@ -309,45 +321,44 @@ def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,re
         refcolumnalign = 0.42
         mescolumnalign = 0.65
 
-
-        ax_top = figure_2.add_subplot(gs[0,:])
+        ax_top = figure_2.add_subplot(gs[0, :])
         # ax_top.text(0.01,verticaltexti,'Reference Test')
         # ax_top.text(0.01, verticaltexti -  verticaltextpad, 'Reference Test')
-        ax_top.text(catcolumnalgin, verticaltexti - 2*verticaltextpad, "measurement date: ")
-        ax_top.text(catcolumnalgin, verticaltexti - 3*verticaltextpad, "Measurement time: ")
-        ax_top.text(catcolumnalgin, verticaltexti - 4*verticaltextpad, "Mesasurement type: ")
-        ax_top.text(catcolumnalgin,verticaltexti - 5*verticaltextpad, "scan direction: ")
-        ax_top.text(catcolumnalgin, verticaltexti - 6*verticaltextpad, "Beam type: ")
-        ax_top.text(catcolumnalgin, verticaltexti - 7*verticaltextpad, "Beam Energy (MV): ")
-        ax_top.text(catcolumnalgin, verticaltexti - 8*verticaltextpad, "Field size (mm): ")
+        ax_top.text(catcolumnalgin, verticaltexti - 2 * verticaltextpad, "measurement date: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 3 * verticaltextpad, "Measurement time: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 4 * verticaltextpad, "Mesasurement type: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 5 * verticaltextpad, "scan direction: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 6 * verticaltextpad, "Beam type: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 7 * verticaltextpad, "Beam Energy (MV): ")
+        ax_top.text(catcolumnalgin, verticaltexti - 8 * verticaltextpad, "Field size (mm): ")
         ax_top.text(catcolumnalgin, verticaltexti - 9 * verticaltextpad, "Depth (mm): ")
 
-        ax_top.text(refcolumnalign,verticaltexti,'Reference Test')
+        ax_top.text(refcolumnalign, verticaltexti, 'Reference Test')
         # ax_top.text(refcolumnalign, verticaltexti -  verticaltextpad, 'Reference Test')
-        ax_top.text(refcolumnalign, verticaltexti - 2*verticaltextpad, refmetadata['measurement data'])
-        ax_top.text(refcolumnalign, verticaltexti - 3*verticaltextpad, refmetadata['measurement time'])
-        ax_top.text(refcolumnalign, verticaltexti - 4*verticaltextpad, refmetadata['measurement type'])
-        ax_top.text(refcolumnalign,verticaltexti - 5*verticaltextpad, direction)
-        ax_top.text(refcolumnalign, verticaltexti - 6*verticaltextpad, refmetadata['beam type'])
-        ax_top.text(refcolumnalign, verticaltexti - 7*verticaltextpad, refmetadata['beam energy'])
-        ax_top.text(refcolumnalign, verticaltexti - 8*verticaltextpad, refmetadata['field size x'])
+        ax_top.text(refcolumnalign, verticaltexti - 2 * verticaltextpad, refmetadata['measurement data'])
+        ax_top.text(refcolumnalign, verticaltexti - 3 * verticaltextpad, refmetadata['measurement time'])
+        ax_top.text(refcolumnalign, verticaltexti - 4 * verticaltextpad, refmetadata['measurement type'])
+        ax_top.text(refcolumnalign, verticaltexti - 5 * verticaltextpad, direction)
+        ax_top.text(refcolumnalign, verticaltexti - 6 * verticaltextpad, refmetadata['beam type'])
+        ax_top.text(refcolumnalign, verticaltexti - 7 * verticaltextpad, refmetadata['beam energy'])
+        ax_top.text(refcolumnalign, verticaltexti - 8 * verticaltextpad, refmetadata['field size x'])
         ax_top.text(refcolumnalign, verticaltexti - 9 * verticaltextpad, refmetadata['startZ'])
 
-        ax_top.text(mescolumnalign,verticaltexti,'Measurement Test')
+        ax_top.text(mescolumnalign, verticaltexti, 'Measurement Test')
         # ax_top.text(mescolumnalign, verticaltexti -  verticaltextpad, 'Reference Test')
-        ax_top.text(mescolumnalign, verticaltexti - 2*verticaltextpad, mesmetadata['measurement data'])
-        ax_top.text(mescolumnalign, verticaltexti - 3*verticaltextpad, mesmetadata['measurement time'])
-        ax_top.text(mescolumnalign, verticaltexti - 4*verticaltextpad, mesmetadata['measurement type'])
-        ax_top.text(mescolumnalign,verticaltexti - 5*verticaltextpad, direction)
-        ax_top.text(mescolumnalign, verticaltexti - 6*verticaltextpad, mesmetadata['beam type'])
-        ax_top.text(mescolumnalign, verticaltexti - 7*verticaltextpad, mesmetadata['beam energy'])
-        ax_top.text(mescolumnalign, verticaltexti - 8*verticaltextpad, mesmetadata['field size x'])
+        ax_top.text(mescolumnalign, verticaltexti - 2 * verticaltextpad, mesmetadata['measurement data'])
+        ax_top.text(mescolumnalign, verticaltexti - 3 * verticaltextpad, mesmetadata['measurement time'])
+        ax_top.text(mescolumnalign, verticaltexti - 4 * verticaltextpad, mesmetadata['measurement type'])
+        ax_top.text(mescolumnalign, verticaltexti - 5 * verticaltextpad, direction)
+        ax_top.text(mescolumnalign, verticaltexti - 6 * verticaltextpad, mesmetadata['beam type'])
+        ax_top.text(mescolumnalign, verticaltexti - 7 * verticaltextpad, mesmetadata['beam energy'])
+        ax_top.text(mescolumnalign, verticaltexti - 8 * verticaltextpad, mesmetadata['field size x'])
         ax_top.text(mescolumnalign, verticaltexti - 9 * verticaltextpad, mesmetadata['startZ'])
 
-        ax_top.text(catcolumnalgin,verticaltexti - 11 * verticaltextpad,"Pass rate%: ")
+        ax_top.text(catcolumnalgin, verticaltexti - 11 * verticaltextpad, "Pass rate%: ")
         ax_top.text(refcolumnalign, verticaltexti - 11 * verticaltextpad, round((pass_ratio / 1) * 100, 2))
 
-        ax_1 = figure_2.add_subplot(gs[1,:-1])
+        ax_1 = figure_2.add_subplot(gs[1, :-1])
         ax_1.tick_params(direction='in')
         ax_1.tick_params(axis='x', bottom='on', top='on')
         ax_1.tick_params(labeltop='on')
@@ -371,7 +382,7 @@ def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,re
         ax_1.legend(curves, labels, loc='center left')
         ax_1.grid(True)
 
-        ax_3 = figure_2.add_subplot(gs[1:,-1])
+        ax_3 = figure_2.add_subplot(gs[1:, -1])
         ax_3.hist(valid_gamma, bins, density=True)  # y value is probability density in each bin
         # plt.hist(valid_gamma, bins, density=False) #y value is counts in each bin
         ax_3.set_xlim([0, gamma_options['max_gamma']])
@@ -381,7 +392,6 @@ def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,re
         ax_3.vlines(x=[1], ymin=0, ymax=1, colors='purple', ls='--', lw=2, label='target')
         # plt.savefig('1D_{0}_histogram.png'.format(gamma_norm_condition), dpi=300)  # plt.savefig() must be before plt.show()
         # show gamma index together with dose points
-
 
         # save figure first and show it
         figureName = '1D dose_reference_evaluation_{0} index.png'.format(gamma_norm_condition)
@@ -394,10 +404,9 @@ def gammareport(dose_reference,axis_reference,dose_evaluation,axis_evaluation,re
         pp.savefig(figure_2)
 
 
-    except:
+    except Exception as e:
         pass
-        print("error occured for measurements" )
-
+        print("error occured for measurements:  ", e)
 
 
 """ start of the tkinter window build and run"""
