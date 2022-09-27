@@ -4,6 +4,6 @@ one dimensional scan gamma analysis for the purposes of annual profile compariso
 To do:
 Clean up output so that it looks better (cpisper lines, better colors, maybe a logo)
 add more info to title of page
-find out about FFF
+find out about FFF - you will just have to save as a different ascii file. 
 add pdf save to propt
 add prompt to tell you if all tests were analyzed and why some weren't (the toughest task imo)
