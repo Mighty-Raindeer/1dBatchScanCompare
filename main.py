@@ -269,6 +269,8 @@ def gammacalc():
         else:
             print("I have no idea what is happening here...")
 
+    print('All scans completed')
+
     pp.close()
 
 
@@ -276,9 +278,9 @@ def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation
     try:
 
         gamma_options = {
-            'dose_percent_threshold': 1,
-            'distance_mm_threshold': 1,
-            'lower_percent_dose_cutoff': 75,
+            'dose_percent_threshold': 2,
+            'distance_mm_threshold': 2,
+            'lower_percent_dose_cutoff': 50,
             'interp_fraction': 10,  # Should be 10 or more for more accurate results
             'max_gamma': 2,
             'random_subset': None,
@@ -396,12 +398,15 @@ def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation
         # save figure first and show it
         figureName = '1D dose_reference_evaluation_{0} index.png'.format(gamma_norm_condition)
         plt.savefig(figureName)  # plt.savefig() must be before plt.show()
-        plt.show()
+        #plt.show()
 
         # joinfig = plt.figure()
         # axis1 = joinfig.add_subplot(211)
         # axis1.
         pp.savefig(figure_2)
+
+       
+        print("success")
 
 
     except Exception as e:
