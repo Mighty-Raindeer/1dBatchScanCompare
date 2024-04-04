@@ -365,13 +365,13 @@ def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation
         ax_1.tick_params(axis='x', bottom='on', top='on')
         ax_1.tick_params(labeltop='on')
         ax_1.minorticks_on()
-        ax_1.set_xlabel('x(mm)')
-        ax_1.set_ylabel('dose(Gy/MU)')
+        ax_1.set_xlabel('x(mm)', fontsize=10, labelpad=2)
+        ax_1.set_ylabel('dose(Gy/MU)', fontsize=10, labelpad=2)
         ax_1.set_ylim([0, max(max_ref_dose, max_eva_dose) * 1.1])
 
         ax_2 = ax_1.twinx()
         ax_2.minorticks_on()
-        ax_2.set_ylabel('gamma index')
+        ax_2.set_ylabel('gamma index', fontsize=10, labelpad=2)
         ax_2.set_ylim([0, gamma_options['max_gamma'] * 2.0])
 
         curve_0 = ax_1.plot(axis_reference, dose_reference, 'k-', label='reference dose')
@@ -388,8 +388,8 @@ def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation
         ax_3.hist(valid_gamma, bins, density=True)  # y value is probability density in each bin
         # plt.hist(valid_gamma, bins, density=False) #y value is counts in each bin
         ax_3.set_xlim([0, gamma_options['max_gamma']])
-        ax_3.set_xlabel('gamma index of reference point')  # FG
-        ax_3.set_ylabel('probability density')
+        ax_3.set_xlabel('gamma index of reference point', fontsize=10, labelpad=2)  # FG
+        ax_3.set_ylabel('probability density', fontsize=10, labelpad=2)
         # plt.ylabel('counts')
         ax_3.vlines(x=[1], ymin=0, ymax=1, colors='purple', ls='--', lw=2, label='target')
         # plt.savefig('1D_{0}_histogram.png'.format(gamma_norm_condition), dpi=300)  # plt.savefig() must be before plt.show()
@@ -404,7 +404,7 @@ def gammareport(dose_reference, axis_reference, dose_evaluation, axis_evaluation
         # axis1 = joinfig.add_subplot(211)
         # axis1.
         pp.savefig(figure_2)
-
+        plt.close(figure_2)
        
         print("success")
 
